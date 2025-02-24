@@ -1,6 +1,7 @@
+using Fusion;
 using UnityEngine;
 
-public class Explosion : MonoBehaviour
+public class Explosion : NetworkBehaviour
 {
     public AnimatedSpriteRenderer start;
     public AnimatedSpriteRenderer middle;
@@ -23,5 +24,4 @@ public class Explosion : MonoBehaviour
     {
         Destroy(gameObject, seconds);
     }
-
 }

@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 7412595423381101528}
   - component: {fileID: 7130143267163553251}
   - component: {fileID: 3206997178263591778}
-  - component: {fileID: 4717686588330254539}
-  - component: {fileID: 2509774604990947253}
+  - component: {fileID: -8505530609759159863}
   m_Layer: 7
   m_Name: Destructible
   m_TagString: Untagged
@@ -177,7 +176,7 @@ MonoBehaviour:
   - {fileID: 5036287530919477878, guid: f317680876d86174cbda6566157d27a1, type: 3}
   - {fileID: 986329979393125885, guid: fe30b620828732845a5858429517d945, type: 3}
   - {fileID: 4315117850915070727, guid: 2260da9f52874ae49a19dd9620d0016e, type: 3}
---- !u!114 &4717686588330254539
+--- !u!114 &-8505530609759159863
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,33 +185,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2840133426897246877}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 0
-  OwnershipTransfer: 0
-  observableSearch: 1
-  ObservedComponents:
+  SortKey: 2748723257
+  ObjectInterest: 1
+  Flags: 1
+  NestedObjects: []
+  NetworkedBehaviours:
   - {fileID: 7130143267163553251}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &2509774604990947253
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2840133426897246877}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
+  - {fileID: 3206997178263591778}
+  ForceRemoteRenderTimeframe: 0

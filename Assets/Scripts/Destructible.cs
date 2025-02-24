@@ -1,7 +1,8 @@
-using Photon.Pun;
+
+using Fusion;
 using UnityEngine;
 
-public class Destructible : MonoBehaviourPunCallbacks
+public class Destructible : NetworkBehaviour
 {
     public float destructionTime = 1f;
     [Range(0f, 1f)]
@@ -10,21 +11,15 @@ public class Destructible : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (photonView.IsMine)
-        {
-            Destroy(gameObject, destructionTime);
-        }
+        Destroy(gameObject, destructionTime);
     }
 
     private void OnDestroy()
     {
-        if (photonView.IsMine && spawnableItems.Length > 0 && Random.value < itemSpawnChance)
+        if (spawnableItems.Length > 0 && Random.value < itemSpawnChance)
         {
             int randomIndex = Random.Range(0, spawnableItems.Length);
-            PhotonNetwork.Instantiate(spawnableItems[randomIndex].name, transform.position, Quaternion.identity);
+            Instantiate(spawnableItems[randomIndex], transform.position, Quaternion.identity);
         }
-
-        // Notify GameManager about tile destruction
-        GameManager.Instance.ClearDestructibleTile(transform.position);
     }
 }

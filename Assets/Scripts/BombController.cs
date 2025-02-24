@@ -1,117 +1,127 @@
-using Photon.Pun;
-using Photon.Pun.Demo.PunBasics;
+using Fusion;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
-public class BombController : MonoBehaviourPun
+public class BombController : NetworkBehaviour
 {
     [Header("Bomb")]
-    [SerializeField] GameObject bombPrefab;
-    public KeyCode inputKey = KeyCode.Space;
-    [SerializeField] float bombFuseTime = 3f;
-   
+    public GameObject bombPrefab;
+    public float bombFuseTime = 3f;
+    public int bombAmount = 1;
+    private int bombsRemaining;
 
-#if UNITY_ANDROID || UNITY_IOS
-    [Header("Mobile Controls")]
-    public Button bombButton; // UI Button for bomb placement
-#endif
+    [Header("Explosion")]
+    public Explosion explosionPrefab;
+    public LayerMask explosionLayerMask;
+    public float explosionDuration = 1f;
+    public int explosionRadius = 1;
+
+    [Header("Destructible")]
+    public Tilemap destructibleTiles;
+    public Destructible destructiblePrefab;
+
+    private void Awake()
+    {
+        // Automatically assign the destructible tilemap if not set in the Inspector.
+        if (destructibleTiles == null)
+        {
+            GameObject dt = GameObject.FindGameObjectWithTag("DestructibleTile");
+            if (dt != null)
+            {
+                destructibleTiles = dt.GetComponentInChildren<Tilemap>();
+            }
+            else
+            {
+                Debug.LogWarning("Destructible tilemap not found. Please assign it manually or tag your Tilemap with 'DestructibleTile'.");
+            }
+        }
+    }
 
     private void OnEnable()
     {
-        if (photonView.IsMine)
-        {
-            GameManager.Instance.SetBombAmountForPlayer(photonView.OwnerActorNr, GameManager.Instance.defaultBombAmount);
-        }
-
-#if UNITY_ANDROID || UNITY_IOS
-        // Add listener for bomb button press on mobile platforms
-        if (photonView.IsMine && bombButton != null)
-        {
-            bombButton.onClick.AddListener(() =>
-            {
-                Debug.Log("Bomb Button Pressed!");
-                StartCoroutine(PlaceBomb());
-            });
-        }
-#endif
+        bombsRemaining = bombAmount;
     }
 
-    private void Update()
+    // This public method can be linked to a UI Button OnClick event.
+    public void TriggerBombPlacement()
     {
-        // Ensure only the local player can place bombs
-        if (!photonView.IsMine) return;
-
-#if !UNITY_ANDROID && !UNITY_IOS
-        // Handle bomb placement through keyboard on non-mobile platforms
-        if (GameManager.Instance.GetdefaultBombAmountForPlayer(photonView.OwnerActorNr) > 0 && Input.GetKeyDown(inputKey))
+        if (bombsRemaining > 0)
         {
-            Debug.Log("Bomb Key Pressed");
             StartCoroutine(PlaceBomb());
         }
-#endif
-    }
-
-    // Place bombs using photon network to synchronize across players
-    public void PlaceBombs()
-    {
-        if (!photonView.IsMine) return; // Prevent non-owners from placing bombs
-        StartCoroutine(PlaceBomb());
     }
 
     private IEnumerator PlaceBomb()
     {
-        if (!photonView.IsMine) yield break; // Prevent non-owners from executing this method
-
-        int currentBombAmount = GameManager.Instance.GetBombAmountForPlayer(photonView.OwnerActorNr);
-        Debug.Log("PlaceBomb Coroutine Started");
-
-        // Check if there are bombs remaining
-        if (currentBombAmount <= 0)
-        {
-            Debug.Log("No Bombs Remaining!");
-            yield break;
-        }
-        // Decrease bombs remaining for this player
-        GameManager.Instance.DecreaseBombAmountForPlayer(photonView.OwnerActorNr);
-
-        // Get the player's position
-        Vector2 position = GameObject.FindGameObjectWithTag("Player").transform.position;
+        // Snap the bomb position to the grid.
+        Vector2 position = transform.position;
         position.x = Mathf.Round(position.x);
         position.y = Mathf.Round(position.y);
 
-        // Instantiate bomb over the network for all players
-        GameObject bomb = PhotonNetwork.Instantiate(bombPrefab.name, position, Quaternion.identity);
-        if (bomb == null)
-        {
-            Debug.LogError("Bomb Instantiation Failed!");
-        }
-        else
-        {
-            Debug.Log("Bomb Placed Successfully");
-        }
+        GameObject bomb = Instantiate(bombPrefab, position, Quaternion.identity);
+        bombsRemaining--;
 
-        // Wait for the fuse time before triggering explosion
         yield return new WaitForSeconds(bombFuseTime);
 
+        // Ensure the explosion is centered on the grid.
         position = bomb.transform.position;
         position.x = Mathf.Round(position.x);
         position.y = Mathf.Round(position.y);
 
-        // Notify GameManager to handle the explosion (Ensure it's synchronized across network)
-        photonView.RPC("HandleExplosion", RpcTarget.All, position);
+        Explosion explosion = Instantiate(explosionPrefab, position, Quaternion.identity);
+        explosion.SetActiveRenderer(explosion.start);
+        explosion.DestroyAfter(explosionDuration);
 
-        // Destroy the bomb after explosion
+        // Explode in all four cardinal directions.
+        Explode(position, Vector2.up, explosionRadius);
+        Explode(position, Vector2.down, explosionRadius);
+        Explode(position, Vector2.left, explosionRadius);
+        Explode(position, Vector2.right, explosionRadius);
+
         Destroy(bomb);
-        GameManager.Instance.IncreaseBombAmountForPlayer(photonView.OwnerActorNr);  // Replenish bombs after explosion
-    }   
+        bombsRemaining++;
+    }
 
-        // This RPC will handle the explosion logic across all clients
-    [PunRPC]
-    private void HandleExplosion(Vector2 position)
+    private void Explode(Vector2 position, Vector2 direction, int length)
     {
-        // Handle explosion logic, such as damage, effects, etc.
-        GameManager.Instance.HandleExplosion(position);
+        if (length <= 0)
+        {
+            return;
+        }
+
+        position += direction;
+
+        if (Physics2D.OverlapBox(position, Vector2.one / 2f, 0f, explosionLayerMask))
+        {
+            ClearDestructible(position);
+            return;
+        }
+
+        Explosion explosion = Instantiate(explosionPrefab, position, Quaternion.identity);
+        explosion.SetActiveRenderer(length > 1 ? explosion.middle : explosion.end);
+        explosion.SetDirection(direction);
+        explosion.DestroyAfter(explosionDuration);
+
+        Explode(position, direction, length - 1);
+    }
+
+    private void ClearDestructible(Vector2 position)
+    {
+        Vector3Int cell = destructibleTiles.WorldToCell(position);
+        TileBase tile = destructibleTiles.GetTile(cell);
+
+        if (tile != null)
+        {
+            Instantiate(destructiblePrefab, position, Quaternion.identity);
+            destructibleTiles.SetTile(cell, null);
+        }
+    }
+
+    public void AddBomb()
+    {
+        bombAmount++;
+        bombsRemaining++;
     }
 
     private void OnTriggerExit2D(Collider2D other)

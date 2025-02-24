@@ -119,11 +119,10 @@ GameObject:
   - component: {fileID: 6366174893490932361}
   - component: {fileID: 8808370564615330124}
   - component: {fileID: 629681121558011384}
-  - component: {fileID: 4784430691333679716}
-  - component: {fileID: 84360984026463198}
+  - component: {fileID: 5370233010823687808}
   m_Layer: 3
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -223,16 +222,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  inputUp: 119
-  inputDown: 115
-  inputLeft: 97
-  inputRight: 100
+  fixedJoystick: {fileID: 0}
   spriteRendererUp: {fileID: 283183695925187753}
   spriteRendererDown: {fileID: 7889967785190049715}
   spriteRendererLeft: {fileID: 3155167659704789118}
   spriteRendererRight: {fileID: 6078194527883244603}
   spriteRendererDeath: {fileID: 5509902294540999197}
-  joystick: {fileID: 0}
 --- !u!114 &629681121558011384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,11 +240,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 161c0228d8bd22f4f9232dbaf632f31e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bombPrefab: {fileID: 6682413782171418322, guid: 745e6b89008cf3d479ad2e297d197f82, type: 3}
-  inputKey: 32
+  bombPrefab: {fileID: 6682413782171418322, guid: 277ecf8cccffa344597e02400adc06d2, type: 3}
   bombFuseTime: 3
-  bombButton: {fileID: 0}
---- !u!114 &4784430691333679716
+  bombAmount: 1
+  explosionPrefab: {fileID: 872952385005012727, guid: 673d7e867b587f04ba63aea6094f6bdf, type: 3}
+  explosionLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  explosionDuration: 1
+  explosionRadius: 1
+  destructibleTiles: {fileID: 0}
+  destructiblePrefab: {fileID: 3206997178263591778, guid: 2d4758e3c2ba5a547bb8978ab9d4cca5, type: 3}
+--- !u!114 &5370233010823687808
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -258,41 +260,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 2655352700585325171}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 0
-  ObservedComponents:
-  - {fileID: 84360984026463198}
+  SortKey: 3647809410
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 8808370564615330124}
+  - {fileID: 629681121558011384}
   - {fileID: 283183695925187753}
   - {fileID: 7889967785190049715}
   - {fileID: 3155167659704789118}
   - {fileID: 6078194527883244603}
   - {fileID: 5509902294540999197}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &84360984026463198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2655352700585325171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &5639166048774975842
 GameObject:
   m_ObjectHideFlags: 0

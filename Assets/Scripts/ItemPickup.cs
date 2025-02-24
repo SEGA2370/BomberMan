@@ -1,6 +1,7 @@
+using Fusion;
 using UnityEngine;
 
-public class ItemPickup : MonoBehaviour
+public class ItemPickup : NetworkBehaviour
 {
     public enum ItemType
     {
@@ -13,27 +14,22 @@ public class ItemPickup : MonoBehaviour
 
     private void OnItemPickup(GameObject player)
     {
-        // Check if the player is active before applying the item effect
-        if (player != null && player.activeSelf)
+        switch (type)
         {
-            switch (type)
-            {
-                case ItemType.ExtraBomb:
-                    GameManager.Instance.IncreaseBombAmount();
-                    break;
+            case ItemType.ExtraBomb:
+                player.GetComponent<BombController>().AddBomb();
+                break;
 
-                case ItemType.BlastRadius:
-                    GameManager.Instance.IncreaseExplosionRadius();
-                    break;
+            case ItemType.BlastRadius:
+                player.GetComponent<BombController>().explosionRadius++;
+                break;
 
-                case ItemType.SpeedIncrease:
-                    player.GetComponent<MovementController>().speed++;
-                    break;
-            }
-
-            // Destroy the item after pickup
-            Destroy(gameObject);
+            case ItemType.SpeedIncrease:
+                player.GetComponent<MovementController>().speed++;
+                break;
         }
+
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
